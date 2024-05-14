@@ -32,10 +32,28 @@ void Library::addPerson(BasePerson* person) {
 
 void Library::executeTransaction(Transaction* t) {
     if (t != nullptr) {
+        vector<vector<string>> availableBooks = db.listAvailableBooks();
+        
+        if (availableBooks.empty()) {
+            cout << "Mevcut ödünç alınabilir kitap yok." << endl;
+            return;
+        }
+
+        cout << "Mevcut ödünç alınabilir kitaplar:" << endl;
+        for (const auto& book : availableBooks) {
+            cout << "Başlık: " << book[0] << ", Yazar: " << book[1] << ", ISBN: " << book[2] << endl;
+        }
+
+        cout << "Ödünç almak istediğiniz kitabın ISBN numarasını girin: ";
+        string isbn;
+        cin >> isbn;
+
+        db.updateBookAvailability(isbn, false);
         t->execute();
+        
         transactions.push_back(t);
-        std::cout << "İşlem başarıyla gerçekleştirildi." << std::endl;
+        cout << "İşlem başarıyla gerçekleştirildi." << endl;
     } else {
-        std::cerr << "İşlem gerçekleştirilemedi: Geçersiz işlem nesnesi." << std::endl;
+        cerr << "İşlem gerçekleştirilemedi: Geçersiz işlem nesnesi." << endl;
     }
 }

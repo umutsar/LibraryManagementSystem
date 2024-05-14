@@ -120,3 +120,51 @@ vector<string> Database::getBookInfo(string isbn) {
         return {"Hata: Sorgu çalıştırılamadı."};
     }
 }
+
+bool Database::verifyUser(const string& userId, const string& password) {
+    string selectUserSQL = "SELECT * FROM members WHERE userID = '" + userId + "' AND password = '" + password + "';";
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, selectUserSQL.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        cerr << "Sorgu hazırlanamadı: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+
+    rc = sqlite3_step(stmt);
+    bool userExists = rc == SQLITE_ROW;
+    sqlite3_finalize(stmt);
+    return userExists;
+}
+
+vector<vector<string>> Database::listAvailableBooks() {
+    string sql = "SELECT title, author, isbn FROM books WHERE isAvailable = 1;";
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        cerr << "Sorgu hazırlanamadı: " << sqlite3_errmsg(db) << endl;
+        return {};
+    }
+    
+    vector<vector<string>> availableBooks;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        vector<string> book;
+        for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+            book.push_back(reinterpret_cast<const char *>(sqlite3_column_text(stmt, i)));
+        }
+        availableBooks.push_back(book);
+    }
+
+    sqlite3_finalize(stmt);
+    return availableBooks;
+}
+
+void Database::updateBookAvailability(string isbn, bool isAvailable) {
+    string sql = "UPDATE books SET isAvailable = " + to_string(isAvailable) + " WHERE isbn = '" + isbn + "';";
+    rc = sqlite3_exec(db, sql.c_str(), NULL, 0, &errMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "Kitap durumu güncellenemedi: " << errMsg << endl;
+        sqlite3_free(errMsg);
+    } else {
+        cout << "Kitap durumu başarıyla güncellendi." << endl;
+    }
+}

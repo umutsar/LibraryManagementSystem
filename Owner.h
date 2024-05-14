@@ -8,4 +8,4 @@ public:
     void displayInfo() const override;
 };
 
-#endif // OWNER_H
+#endif
