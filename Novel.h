@@ -6,6 +6,7 @@
 class Novel : public Book {
 public:
     void displayInfo() const;
+    string getGenre() const { return genre; }
 
 private:
     string genre;

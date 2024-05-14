@@ -6,6 +6,7 @@
 class Magazine : public Book {
 public:
     void displayInfo() const;
+    string getIssueNo() const { return issueNo; }
 
 private:
     string issueNo;

@@ -9,6 +9,10 @@ public:
     void checkout();
     void returnBook();
 
+    string getTitle() const { return title; }
+    string getAuthor() const { return author; }
+    string getISBN() const { return isbn; }
+
 protected:
     string title;
     string author;

@@ -6,6 +6,7 @@
 class HistoryBook : public Book {
 public:
     void displayInfo() const;
+    string getHistoricalPeriod() const { return historicalPeriod; }
 
 private:
     string historicalPeriod;
