@@ -29,6 +29,9 @@ public:
     ~Database();
     void addMember(string name, string surname, string password, string category);
     vector<string> getMember(string userID);
+
+    void addBook(string title, string author, string isbn, string genre, string issueNo, string historicalPeriod, string publicationDate, bool isAvailable);
+    vector<string> getBookInfo(string isbn);
 };
 
 #endif // DATABASE_H

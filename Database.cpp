@@ -79,3 +79,44 @@ string Database::generateUserID() {
     }
     return userID;
 }
+
+void Database::addBook(string title, string author, string isbn, string genre, string issueNo, string historicalPeriod, string publicationDate, bool isAvailable) {
+    string insertBookSQL = "INSERT INTO books (title, author, isbn, genre, issueNo, historicalPeriod, publicationDate, isAvailable) VALUES ('" 
+                            + title + "', '" + author + "', '" + isbn + "', '" + genre + "', '" + issueNo + "', '" 
+                            + historicalPeriod + "', '" + publicationDate + "', " + (isAvailable ? "1" : "0") + ");";
+
+    rc = sqlite3_exec(db, insertBookSQL.c_str(), NULL, 0, &errMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "Kitap eklenemedi: " << errMsg << endl;
+        sqlite3_free(errMsg);
+    } else {
+        cout << "Kitap başarıyla eklendi." << endl;
+    }
+}
+
+vector<string> Database::getBookInfo(string isbn) {
+    string selectBookSQL = "SELECT * FROM books WHERE isbn = '" + isbn + "';";
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, selectBookSQL.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        cerr << "Sorgu hazırlanamadı: " << sqlite3_errmsg(db) << endl;
+        return {"Hata: Sorgu hazırlanamadı."};
+    }
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        vector<string> bookData;
+        for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+            bookData.push_back(reinterpret_cast<const char *>(sqlite3_column_text(stmt, i)));
+        }
+        sqlite3_finalize(stmt);
+        return bookData;
+    } else if (rc == SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return {"Hata: Kitap bulunamadı."};
+    } else {
+        cerr << "Sorgu çalıştırılamadı: " << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        return {"Hata: Sorgu çalıştırılamadı."};
+    }
+}
