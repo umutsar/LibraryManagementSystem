@@ -1,0 +1,107 @@
+@startuml
+
+class Library {
+    - vector<Book*> books
+    - vector<BasePerson*> persons
+    - vector<Transaction*> transactions
+    + void addBook(Book* book)
+    + void addPerson(BasePerson* person)
+    + void executeTransaction(Transaction* t)
+}
+
+class Librarian {
+    - string librarianId
+    + void manageBooks(Book* book)
+    + void managePersons(BasePerson* person)
+}
+
+Library *-- Librarian : manages
+Library o-- Book
+Library o-- BasePerson
+Library o-- Transaction
+
+abstract class BasePerson {
+    - string personId
+    - string name
+    - string email
+    + void displayInfo() 
+}
+
+class Student {
+    - int grade
+    + void displayInfo()
+}
+
+class AcademicStaff {
+    - string department
+    + void displayInfo()
+}
+
+BasePerson <|-- Student
+BasePerson <|-- AcademicStaff
+
+abstract class Transaction {
+    - string transId
+    - string date
+    + void execute() 
+}
+
+class Borrow {
+    - string borrowDate
+    + void execute()
+}
+
+class Return {
+    - string returnDate
+    + void execute()
+}
+
+Transaction <|-- Borrow
+Transaction <|-- Return
+
+class Book {
+    - string title
+    - string author
+    - string isbn
+    + void checkout()
+    + void returnBook()
+}
+
+class Magazine {
+    - string issueNo
+    + void displayInfo()
+}
+
+class Novel {
+    - string genre
+    + void displayInfo()
+}
+
+class HistoryBook {
+    - string historicalPeriod
+    + void displayInfo()
+}
+
+Book <|-- Magazine
+Book <|-- Novel
+Book <|-- HistoryBook
+
+BasePerson <|-- Expert
+
+class Expert {
+    -- 
+
+}
+
+class Admin {
+
+}
+
+class Owner {
+
+}
+
+Expert <|-- Admin
+Expert <|-- Owner
+
+@enduml
