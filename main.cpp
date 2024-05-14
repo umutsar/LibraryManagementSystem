@@ -186,6 +186,7 @@ int main()
                     break;
                 case 5:
                     cout << "Çıkış yapılıyor..." << endl;
+                    isLogedIn = false;
                     break;
                 default:
                     cout << "Geçersiz seçim, tekrar deneyin." << endl;
