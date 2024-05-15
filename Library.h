@@ -24,4 +24,4 @@ private:
     Database db;
 };
 
-#endif 
+#endif

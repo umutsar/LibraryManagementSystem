@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <random>
 #include <vector>
-#include <sstream> // Ekleme
+#include <sstream> 
 
 using namespace std;
 
@@ -36,6 +36,8 @@ public:
 
     vector<vector<string>> listAvailableBooks();
     void updateBookAvailability(string isbn, bool isAvailable);
+
+    bool isUserAdmin(const string& userId);
 };
 
-#endif // DATABASE_H
+#endif 

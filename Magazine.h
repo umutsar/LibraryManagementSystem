@@ -12,4 +12,4 @@ private:
     string issueNo;
 };
 
-#endif // MAGAZINE_H
+#endif 

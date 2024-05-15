@@ -19,4 +19,4 @@ protected:
     string isbn;
 };
 
-#endif // BOOK_H
+#endif

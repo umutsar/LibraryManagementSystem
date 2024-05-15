@@ -20,9 +20,9 @@ Database::~Database() {
 
 void Database::addMember(string name, string surname, string password, string category) {
     string loginDate = getCurrentDate();
-    string insertDataSQL = "INSERT INTO members (userID, name, surname, password, category, loginDate) VALUES ('" 
+    string insertDataSQL = "INSERT INTO members (userID, name, surname, password, category, loginDate, isAdmin) VALUES ('" 
                             + generateUserID() + "', '" + name + "', '" + surname + "', '" + password + "', '" 
-                            + category + "', '" + loginDate + "');";
+                            + category + "', '" + loginDate + "', 0);";
 
     rc = sqlite3_exec(db, insertDataSQL.c_str(), NULL, 0, &errMsg);
     if (rc != SQLITE_OK) {
@@ -81,8 +81,8 @@ string Database::generateUserID() {
 }
 
 void Database::addBook(string title, string author, string isbn, string genre, string issueNo, string historicalPeriod, string publicationDate, bool isAvailable) {
-    string insertBookSQL = "INSERT INTO books (title, author, isbn, genre, issueNo, historicalPeriod, publicationDate, isAvailable) VALUES ('" 
-                            + title + "', '" + author + "', '" + isbn + "', '" + genre + "', '" + issueNo + "', '" 
+    string insertBookSQL = "INSERT INTO books (title, author, isbn, genre, issueNo, historicalPeriod, publicationDate, isAvailable) VALUES ('"
+                            + title + "', '" + author + "', '" + isbn + "', '" + genre + "', '" + issueNo + "', '"
                             + historicalPeriod + "', '" + publicationDate + "', " + (isAvailable ? "1" : "0") + ");";
 
     rc = sqlite3_exec(db, insertBookSQL.c_str(), NULL, 0, &errMsg);
@@ -167,4 +167,22 @@ void Database::updateBookAvailability(string isbn, bool isAvailable) {
     } else {
         cout << "Kitap durumu başarıyla güncellendi." << endl;
     }
+}
+
+bool Database::isUserAdmin(const string& userId) {
+    string sql = "SELECT isAdmin FROM members WHERE userID = '" + userId + "';";
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        cerr << "Sorgu hazırlanamadı: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+
+    rc = sqlite3_step(stmt);
+    bool isAdmin = false;
+    if (rc == SQLITE_ROW) {
+        isAdmin = sqlite3_column_int(stmt, 0) == 1;
+    }
+    sqlite3_finalize(stmt);
+    return isAdmin;
 }

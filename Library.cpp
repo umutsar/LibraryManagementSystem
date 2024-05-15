@@ -4,18 +4,19 @@
 #include "Transaction.h"
 #include <iostream>
 
+using namespace std;
+
 Library::Library() {
-    // Burada veritabanı bağlantısını ya da diğer gerekli başlangıç işlemlerini yapabilirsiniz
 }
 
 void Library::addBook(Book* book) {
     if (book != nullptr) {
         books.push_back(book);
         // Veritabanına ekleme işlemi
-        db.addBook(book->getTitle(), book->getAuthor(), book->getISBN(), "", "", "", "", true); // Örnek verilerle çağrı
-        std::cout << "Kitap başarıyla eklendi." << std::endl;
+        db.addBook(book->getTitle(), book->getAuthor(), book->getISBN(), "", "", "", "", true);
+        cout << "Kitap başarıyla eklendi." << endl;
     } else {
-        std::cerr << "Kitap eklenemedi: Geçersiz kitap nesnesi." << std::endl;
+        cerr << "Kitap eklenemedi: Geçersiz kitap nesnesi." << endl;
     }
 }
 
@@ -23,10 +24,10 @@ void Library::addPerson(BasePerson* person) {
     if (person != nullptr) {
         persons.push_back(person);
         // Veritabanına ekleme işlemi
-        db.addMember(person->getName(), "Soyad", "şifre", "kategori"); // Örnek veriler kullanıldı
-        std::cout << "Kişi başarıyla eklendi." << std::endl;
+        db.addMember(person->getName(), "Soyad", "şifre", "kategori");
+        cout << "Kişi başarıyla eklendi." << endl;
     } else {
-        std::cerr << "Kişi eklenemedi: Geçersiz kişi nesnesi." << std::endl;
+        cerr << "Kişi eklenemedi: Geçersiz kişi nesnesi." << endl;
     }
 }
 

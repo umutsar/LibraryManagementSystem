@@ -5,10 +5,17 @@
 
 class AcademicStaff : public BasePerson {
 public:
+    AcademicStaff();
     void displayInfo() const override;
+    void setDepartment(const std::string& department);
+    void setPosition(const std::string& position);
+
+    std::string getDepartment() const;
+    std::string getPosition() const;
 
 private:
-    string department;
+    std::string department;
+    std::string position;
 };
 
-#endif // ACADEMICSTAFF_H
+#endif 

@@ -12,4 +12,4 @@ private:
     string historicalPeriod;
 };
 
-#endif // HISTORYBOOK_H
+#endif 

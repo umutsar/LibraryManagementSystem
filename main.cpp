@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Library.h"
-#include "Librarian.h"
 #include "Book.h"
 #include "Magazine.h"
 #include "Novel.h"
@@ -9,27 +8,31 @@
 #include "AcademicStaff.h"
 #include "Borrow.h"
 #include "Return.h"
-#include "Database.h" // Ekleme
+#include "Database.h"
 
 using namespace std;
 
 bool isLogedIn = false;
+bool isAdmin = false;
 
 void showMenu()
 {
     cout << "**Yapmak istediginiz islemi girin:" << endl;
-    cout << "1- Kitap ekle" << endl;
-    cout << "2- Kullanıcı ekle" << endl;
-    cout << "3- Kitap ödünç al" << endl;
-    cout << "4- Kitap iade et" << endl;
-    cout << "5- Çıkış" << endl;
+    cout << "1- Kitap ödünç al" << endl;
+    cout << "2- Kitap iade et" << endl;
+    if (isAdmin)
+    {
+        cout << "3- Kitap ekle" << endl;
+        cout << "4- Kullanıcı ekle" << endl;
+    }
+    cout << "0- Çıkış" << endl;
 }
 
 void addBook(Library &library, Database &db)
 {
     string title, author, isbn, genre, issueNo, historicalPeriod, publicationDate;
+    cin.ignore(); // \n lerin karmaşıklığını önlemek için.
     cout << "Kitabin basligi: ";
-    cin.ignore();
     getline(cin, title);
     cout << "Kitabin yazari: ";
     getline(cin, author);
@@ -47,18 +50,33 @@ void addBook(Library &library, Database &db)
         cout << "Roman türü: ";
         cin.ignore();
         getline(cin, genre);
+        if (title.empty() || author.empty() || isbn.empty() || genre.empty())
+        {
+            cout << "Gerekli bilgiler eksik. Kitap eklenemedi." << endl;
+            return;
+        }
         book = new Novel();
         break;
     case 2:
         cout << "Dergi sayısı: ";
         cin.ignore();
         getline(cin, issueNo);
+        if (title.empty() || author.empty() || isbn.empty() || issueNo.empty())
+        {
+            cout << "Gerekli bilgiler eksik. Kitap eklenemedi." << endl;
+            return;
+        }
         book = new Magazine();
         break;
     case 3:
         cout << "Tarih dönemi: ";
         cin.ignore();
         getline(cin, historicalPeriod);
+        if (title.empty() || author.empty() || isbn.empty() || historicalPeriod.empty())
+        {
+            cout << "Gerekli bilgiler eksik. Kitap eklenemedi." << endl;
+            return;
+        }
         book = new HistoryBook();
         break;
     default:
@@ -69,13 +87,24 @@ void addBook(Library &library, Database &db)
     cout << "Yayın tarihi (YYYY-MM-DD): ";
     getline(cin, publicationDate);
 
+    if (title.empty() || author.empty() || isbn.empty() || publicationDate.empty())
+    {
+        cout << "Bazı zorunlu bilgiler eksik, kitap eklenemedi." << endl;
+        return;
+    }
+
     library.addBook(book);
-    db.addBook(title, author, isbn, genre, issueNo, historicalPeriod, publicationDate, true);
-    cout << "Kitap başarıyla eklendi." << endl;
+    db.addBook(title, author, isbn,
+               (type == 1 ? genre : ""),
+               (type == 2 ? issueNo : ""),
+               (type == 3 ? historicalPeriod : ""),
+               publicationDate, 1);
 }
 
 void addUser(Library &library, Database &db)
 {
+    system("clear");
+
     string name, surname, password, category;
     cout << "Kullanıcının adı: ";
     cin.ignore();
@@ -109,6 +138,8 @@ void addUser(Library &library, Database &db)
 
 void borrowBook(Library &library)
 {
+    system("clear");
+
     // Kitap ödünç alma işlemleri
     Borrow *borrowAction = new Borrow();
     library.executeTransaction(borrowAction);
@@ -117,14 +148,16 @@ void borrowBook(Library &library)
 
 void returnBook(Library &library, Database &db)
 {
+    system("clear");
+
     cout << "İade etmek istediğiniz kitabın ISBN numarasını girin: ";
     string isbn;
     cin >> isbn;
 
-    // Veritabanındaki kitabın durumunu güncelle
+    // Veritabanındaki kitabın varlığını değiştirdiğimiz yer
     db.updateBookAvailability(isbn, true);
 
-    // İşlemi gerçekleştir
+    // İşlemi gerçekleştirdiğimiz yer
     Return *returnAction = new Return();
     library.executeTransaction(returnAction);
 
@@ -134,65 +167,87 @@ void returnBook(Library &library, Database &db)
 int main()
 {
     Library library;
-    Database db;
+    Database db; // Veritabanına bağlanalım diye burdan nesne oluşturuyoz.
+    system("clear");
 
-    while (1)
+    cout << "LOGIN THE SYSTEM" << endl;
+
+    string userId;
+    string password;
+    while (true)
     {
-        cout << "LOGIN THE SYSTEM" << endl;
+        cout << "user id: ";
+        cin >> userId;
+        cout << "password: ";
+        cin >> password;
 
-        while (true)
+        system("clear");
+
+        if (!db.verifyUser(userId, password))
         {
-            cout << "user id: ";
-            string userId = "";
-            cin >> userId;
-            cout << "password: ";
-            string password = "";
-            cin >> password;
+            cout << "Invalid credentials, try again." << endl;
+        }
+        else
+        {
+            isLogedIn = true;
+            isAdmin = db.isUserAdmin(userId);
+            cout << "Login Successful!" << endl;
+            break;
+        }
+    }
 
-            if (!db.verifyUser(userId, password))
+    if (isLogedIn)
+    {
+        int choice;
+        do
+        {
+            showMenu();
+            cout << "Seçiminiz: ";
+            cin >> choice;
+
+            switch (choice)
             {
-                cout << "Invalid credentials, try again." << endl;
-            }
-            else
-            {
-                isLogedIn = true;
-                cout << "Login Successful!" << endl;
+            case 1:
+                borrowBook(library);
                 break;
-            }
-        }
 
-        if (isLogedIn)
-        {
-            int choice;
-            do
-            {
-                showMenu();
-                cout << "Seçiminiz: ";
-                cin >> choice;
+            case 2:
+                returnBook(library, db);
+                break;
 
-                switch (choice)
+            case 3:
+                if (isAdmin)
                 {
-                case 1:
                     addBook(library, db);
-                    break;
-                case 2:
-                    addUser(library, db);
-                    break;
-                case 3:
-                    borrowBook(library);
-                    break;
-                case 4:
-                    returnBook(library, db);
-                    break;
-                case 5:
-                    cout << "Çıkış yapılıyor..." << endl;
-                    isLogedIn = false;
-                    break;
-                default:
-                    cout << "Geçersiz seçim, tekrar deneyin." << endl;
                 }
-            } while (choice != 5);
-        }
+                else
+                {
+                    cout << "Bu işlemi gerçekleştirme yetkiniz yok." << endl;
+                }
+                break;
+
+            case 4:
+                if (isAdmin)
+                {
+                    addUser(library, db);
+                }
+                else
+                {
+                    cout << "Bu işlemi gerçekleştirme yetkiniz yok." << endl;
+                }
+                break;
+
+            case 0:
+                cout << "Çıkış yapılıyor..." << endl;
+                isLogedIn = false;
+                isAdmin = false; // Çıkış yapıldıktan sonra admin işlemleri olmasın diye false olarak değiştiriyoruz burdaki bayrağı
+                break;
+
+            default:
+                cout << "Geçersiz seçim, tekrar deneyin." << endl;
+            }
+
+        } while (choice != 0);
     }
 
     return 0;

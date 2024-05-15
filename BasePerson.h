@@ -19,4 +19,4 @@ inline string BasePerson::getName() const {
     return name;
 }
 
-#endif 
+#endif

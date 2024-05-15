@@ -13,4 +13,4 @@ protected:
     string date;
 };
 
-#endif // TRANSACTION_H
+#endif

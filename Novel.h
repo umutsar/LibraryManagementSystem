@@ -12,4 +12,4 @@ private:
     string genre;
 };
 
-#endif // NOVEL_H
+#endif
