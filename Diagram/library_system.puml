@@ -7,6 +7,10 @@ class Database {
     + vector<string> getMember(string userID)
     + void addBook(string title, string author, string isbn, string genre, string issueNo, string historicalPeriod, string publicationDate, bool isAvailable)
     + vector<string> getBookInfo(string isbn)
+    + bool verifyUser(const string& userId, const string& password)
+    + bool isUserAdmin(const string& userId)
+    + vector<vector<string>> listAvailableBooks()
+    + void updateBookAvailability(string isbn, bool isAvailable)
 }
 
 
@@ -21,13 +25,7 @@ class Library {
     + void executeTransaction(Transaction* t)
 }
 
-class Librarian {
-    - string librarianId
-    + void manageBooks(Book* book)
-    + void managePersons(BasePerson* person)
-}
 
-Library *-- Librarian : manages
 Library o-- Book
 Library o-- BasePerson
 Library o-- Transaction
@@ -43,12 +41,21 @@ abstract class BasePerson {
 
 class Student {
     - int grade
+    + Student()
     + void displayInfo() const
+    + void setGrade(int grade)
+    + int getGrade() const
 }
 
 class AcademicStaff {
     - string department
+    - string position
+    + AcademicStaff()
     + void displayInfo() const
+    + void setDepartment(const string& department)
+    + void setPosition(const string& position)
+    + string getDepartment() const
+    + string getPosition() const
 }
 
 BasePerson <|-- Student
@@ -106,21 +113,5 @@ class HistoryBook {
 Book <|-- Magazine
 Book <|-- Novel
 Book <|-- HistoryBook
-
-class Expert {
-}
-
-class Admin {
-    + void displayInfo() const
-}
-
-class Owner {
-    + void displayInfo() const
-}
-
-Expert <|-- Admin
-Expert <|-- Owner
-
-BasePerson <|-- Expert
 
 @enduml
